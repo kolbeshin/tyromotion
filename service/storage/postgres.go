@@ -1,6 +1,9 @@
 package storage
 
 import (
+	"log"
+	"os"
+
 	"github.com/SenyashaGo/tyromotion/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -24,16 +27,34 @@ func NewStorage(dsn string) (*Storage, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	users := []models.Doctor{
+		{Email: os.Getenv("USER_1"), Password: os.Getenv("PASSWORD_1")},
+		{Email: os.Getenv("USER_2"), Password: os.Getenv("PASSWORD_2")},
+	}
+
+	for _, user := range users {
+		result := connect.Create(&user)
+		if result.Error != nil {
+			log.Fatal(result.Error)
+		}
+	}
 	return &Storage{connect}, nil
 }
 
-func (s *Storage) Create(patient models.Patient) (int64, error) {
-	tx := s.db.Create(&patient)
-	return tx.RowsAffected, tx.Error
+func (s *Storage) GetDoctorByEmail(email string) (models.Doctor, error) {
+	var doctor models.Doctor
+	tx := s.db.Where("email = ?", email).First(&doctor)
+	return doctor, tx.Error
 }
 
-func (s *Storage) Get(id uint64) (models.Doctor, error) {
+func (s *Storage) Create(doctor models.Doctor) (models.Doctor, error) {
+	tx := s.db.Create(&doctor)
+	return doctor, tx.Error
+}
+
+func (s *Storage) Get(email string) (models.Doctor, error) {
 	var doctor models.Doctor
-	tx := s.db.First(&doctor, id)
+	tx := s.db.First(&doctor, email)
 	return doctor, tx.Error
 }

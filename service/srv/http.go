@@ -13,7 +13,15 @@ func Run(storage *storage.Storage, config *config.Config) error {
 
 	auth := app.Group("/auth")
 	{
-		auth.POST("/sign-in", SignIn)
+		auth.POST("/sign-in", func(c *gin.Context) {
+			SignIn(c, storage)
+		})
+		auth.GET("/test", func(c *gin.Context) {
+			Test(c, storage)
+		})
+		auth.POST("/test", func(c *gin.Context) {
+			Test2(c, storage)
+		})
 	}
 
 	return app.Run(net.JoinHostPort(config.Host, config.Port))
