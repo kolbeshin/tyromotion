@@ -48,7 +48,34 @@ func (s *Storage) GetDoctorByEmail(email string) (models.Doctor, error) {
 	return doctor, tx.Error
 }
 
-func (s *Storage) Create(doctor models.Doctor) (models.Doctor, error) {
+func (s *Storage) GetPatient(patient models.Patient) (models.Patient, error) {
+	// var patient models.Patient
+	tx := s.db.Where("fullname = ?", patient.FullName).First(&patient)
+	return patient, tx.Error
+}
+
+func (s *Storage) GetAllPatientsFromTable() ([]models.Patient, error) {
+
+	// tx := s.db.Find(&patient)
+	// // if tx.Error != nil {
+	// //     return nil, tx.Error
+	// // }
+	// return patient, tx.Error
+
+	var patient []models.Patient
+	result := s.db.Find(&patient)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return patient, nil
+}
+
+func (s *Storage) CreatePatient(patient models.Patient) (models.Patient, error) {
+	tx := s.db.Create(&patient)
+	return patient, tx.Error
+}
+
+func (s *Storage) CreateDoctor(doctor models.Doctor) (models.Doctor, error) {
 	tx := s.db.Create(&doctor)
 	return doctor, tx.Error
 }
