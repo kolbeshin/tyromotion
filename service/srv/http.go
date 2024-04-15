@@ -29,11 +29,11 @@ func Run(storage *storage.Storage, config *config.Config) error {
 		patient.GET("/all-patients", func(c *gin.Context) {
 			handlers.GetAllPatients(c, storage)
 		})
-		patient.GET("/patient-info", func(c *gin.Context) {
-			handlers.GetPatientInfo(c, storage)
-		}) // надо доделать!!!!!!
-		patient.POST("/patient", func(c *gin.Context) {
+		patient.POST("/add-patient", func(c *gin.Context) {
 			handlers.AddPatient(c, storage)
+		})
+		patient.GET("/completed-treatments/:id", func(c *gin.Context) {
+			handlers.GetCompletedTreatmentsByPatient(c, storage)
 		})
 	}
 
