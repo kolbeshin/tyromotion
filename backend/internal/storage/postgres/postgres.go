@@ -1,12 +1,12 @@
-package storage
+package postgres
 
 import (
-	"log"
-	"os"
-
-	"github.com/SenyashaGo/tyromotion/models"
+	"github.com/golang-jwt/jwt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"log"
+	"os"
+	"tyromotion/backend/internal/models"
 )
 
 type Storage struct {
@@ -27,6 +27,10 @@ func NewStorage(dsn string) (*Storage, error) {
 	if err != nil {
 		return nil, err
 	}
+	err = connect.AutoMigrate(&models.PatientInfo{})
+	if err != nil {
+		return nil, err
+	}
 
 	users := []models.Doctor{
 		{Email: os.Getenv("USER_1"), Password: os.Getenv("PASSWORD_1")},
@@ -40,6 +44,22 @@ func NewStorage(dsn string) (*Storage, error) {
 		}
 	}
 	return &Storage{connect}, nil
+}
+
+func (s *Storage) RegisterUser(user models.User) (models.User, error) {
+	tx := s.db.Create(&user)
+	return user, tx.Error
+}
+
+func (s *Storage) LoginUser(user models.User) (models.User, error) {
+	tx := s.db.Where("email = ?", user.Email).First(&user)
+	return user, tx.Error
+}
+
+func (s *Storage) GetUser(claims *jwt.StandardClaims) (models.User, error) {
+	var user models.User
+	tx := s.db.Where("id = ?", claims.Issuer).First(&user)
+	return user, tx.Error
 }
 
 func (s *Storage) GetDoctorByEmail(email string) (models.Doctor, error) {

@@ -2,15 +2,15 @@ package handlers
 
 import (
 	"net/http"
+	"tyromotion/backend/internal/storage/postgres"
 
-	"github.com/SenyashaGo/tyromotion/storage"
 	"github.com/gin-gonic/gin"
 )
 
-func GetAllPatients(c *gin.Context, storage *storage.Storage) {
+func GetAllPatients(c *gin.Context, storage *postgres.Storage) {
 	patients, err := storage.GetAllPatientsFromTable()
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, err)
 		return
 	}
 
