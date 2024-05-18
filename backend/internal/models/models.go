@@ -2,16 +2,6 @@ package models
 
 import "gorm.io/gorm"
 
-type Doctor struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
-type AuthRequest struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
 type User struct {
 	gorm.Model
 	Name        string `json:"name"`

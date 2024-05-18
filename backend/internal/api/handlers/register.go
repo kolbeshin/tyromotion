@@ -5,6 +5,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
+	"net/mail"
 	"tyromotion/backend/internal/models"
 	"tyromotion/backend/internal/storage/postgres"
 )
@@ -17,6 +18,12 @@ func Register(c *gin.Context, storage *postgres.Storage) {
 	}
 
 	password, _ := bcrypt.GenerateFromPassword([]byte(data["password"]), 14)
+
+	_, err := mail.ParseAddress(data["email"])
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err)
+		return
+	}
 
 	user := models.User{
 		Name:        data["name"],

@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"github.com/golang-jwt/jwt"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"log"
@@ -19,10 +20,6 @@ func NewStorage(dsn string) (*Storage, error) {
 		return nil, err
 	}
 
-	err = connect.AutoMigrate(&models.Doctor{})
-	if err != nil {
-		return nil, err
-	}
 	err = connect.AutoMigrate(&models.Patient{})
 	if err != nil {
 		return nil, err
@@ -32,9 +29,12 @@ func NewStorage(dsn string) (*Storage, error) {
 		return nil, err
 	}
 
-	users := []models.Doctor{
-		{Email: os.Getenv("USER_1"), Password: os.Getenv("PASSWORD_1")},
-		{Email: os.Getenv("USER_2"), Password: os.Getenv("PASSWORD_2")},
+	password1, _ := bcrypt.GenerateFromPassword([]byte(os.Getenv("PASSWORD_1")), 14)
+	password2, _ := bcrypt.GenerateFromPassword([]byte(os.Getenv("PASSWORD_2")), 14)
+
+	users := []models.User{
+		{Email: os.Getenv("USER_1"), Password: password1},
+		{Email: os.Getenv("USER_2"), Password: password2},
 	}
 
 	for _, user := range users {
@@ -62,12 +62,6 @@ func (s *Storage) GetUser(claims *jwt.StandardClaims) (models.User, error) {
 	return user, tx.Error
 }
 
-func (s *Storage) GetDoctorByEmail(email string) (models.Doctor, error) {
-	var doctor models.Doctor
-	tx := s.db.Where("email = ?", email).First(&doctor)
-	return doctor, tx.Error
-}
-
 func (s *Storage) GetAllPatientsFromTable() ([]models.Patient, error) {
 	var patient []models.Patient
 	result := s.db.Find(&patient)
@@ -90,11 +84,5 @@ func (s *Storage) GetCompletedTreatments(id int) (models.Patient, error) {
 
 func (s *Storage) CreateDoctor(doctor models.Doctor) (models.Doctor, error) {
 	tx := s.db.Create(&doctor)
-	return doctor, tx.Error
-}
-
-func (s *Storage) Get(email string) (models.Doctor, error) {
-	var doctor models.Doctor
-	tx := s.db.First(&doctor, email)
 	return doctor, tx.Error
 }
