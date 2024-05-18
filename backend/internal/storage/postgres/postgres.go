@@ -81,8 +81,3 @@ func (s *Storage) GetCompletedTreatments(id int) (models.Patient, error) {
 	tx := s.db.First(&patient, id)
 	return patient, tx.Error
 }
-
-func (s *Storage) CreateDoctor(doctor models.Doctor) (models.Doctor, error) {
-	tx := s.db.Create(&doctor)
-	return doctor, tx.Error
-}
