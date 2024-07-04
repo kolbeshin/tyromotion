@@ -7,9 +7,12 @@ import (
 )
 
 type Config struct {
-	Host string `json:"host"`
-	Port string `json:"port"`
-	Dsn  string `json:"dsn"`
+	Host          string `json:"host"`
+	Port          string `json:"port"`
+	Dsn           string `json:"dsn"`
+	RedisAddress  string `json:"redisAddress"`
+	RedisPassword string `json:"redisPassword"`
+	RedisDB       int    `json:"redisDB"`
 }
 
 func Parse(pathToConfig string) (*Config, error) {

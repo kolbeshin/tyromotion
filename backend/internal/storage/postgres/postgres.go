@@ -28,13 +28,17 @@ func NewStorage(dsn string) (*Storage, error) {
 	if err != nil {
 		return nil, err
 	}
+	err = connect.AutoMigrate(&models.User{})
+	if err != nil {
+		return nil, err
+	}
 
 	password1, _ := bcrypt.GenerateFromPassword([]byte(os.Getenv("PASSWORD_1")), 14)
 	password2, _ := bcrypt.GenerateFromPassword([]byte(os.Getenv("PASSWORD_2")), 14)
 
 	users := []models.User{
-		{Email: os.Getenv("USER_1"), Password: password1},
-		{Email: os.Getenv("USER_2"), Password: password2},
+		{Email: os.Getenv("USER_1"), Password: password1, PhoneNumber: os.Getenv("PHONE_NUMBER_1")},
+		{Email: os.Getenv("USER_2"), Password: password2, PhoneNumber: os.Getenv("PHONE_NUMBER_2")},
 	}
 
 	for _, user := range users {
